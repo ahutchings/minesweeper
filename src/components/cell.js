@@ -1,6 +1,7 @@
 var h = require('virtual-dom/h');
 var xtend = require('xtend');
 var CellStatuses = require('../CellStatuses');
+var GameStatuses = require('../GameStatuses');
 
 module.exports = render;
 
@@ -29,6 +30,7 @@ var normalStyle = {
 };
 
 function render (state) {
+  var isActiveGame = state.gameStatus === GameStatuses.ACTIVE;
   var cell = state.cell;
   var attributes = {};
   var style;
@@ -48,7 +50,7 @@ function render (state) {
         color: 'red'
       });
 
-      attributes.oncontextmenu = function (event) {
+      if (isActiveGame) attributes.oncontextmenu = function (event) {
         event.preventDefault();
 
         state.dispatcher.dispatch({
@@ -63,7 +65,7 @@ function render (state) {
     case CellStatuses.NORMAL:
       style = normalStyle;
 
-      attributes.oncontextmenu = function (event) {
+      if (isActiveGame) attributes.oncontextmenu = function (event) {
         event.preventDefault();
 
         state.dispatcher.dispatch({
@@ -72,7 +74,7 @@ function render (state) {
         });
       };
 
-      attributes.onclick = function (event) {
+      if (isActiveGame) attributes.onclick = function (event) {
         state.dispatcher.dispatch({
           actionType : 'revealCell',
           cell       : cell

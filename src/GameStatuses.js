@@ -1,5 +1,5 @@
 module.exports = {
-  WON        : 'WON',
-  LOST       : 'LOST',
-  INCOMPLETE : 'INCOMPLETE'
+  WON    : 'WON',
+  LOST   : 'LOST',
+  ACTIVE : 'ACTIVE'
 };

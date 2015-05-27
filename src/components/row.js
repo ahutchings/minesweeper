@@ -8,6 +8,7 @@ function render (state) {
     state.row.map(function (item) {
       return cell({
         dispatcher : state.dispatcher,
+        gameStatus : state.gameStatus,
         cell       : item
       });
     })

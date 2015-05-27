@@ -11,6 +11,7 @@ function render (state) {
       h('.cells', state.rows.map(function (item) {
         return row({
           dispatcher : state.dispatcher,
+          gameStatus : state.gameStatus,
           row        : item
         });
       }))

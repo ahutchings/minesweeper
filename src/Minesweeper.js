@@ -24,7 +24,7 @@ Minesweeper.prototype.getStatus = function () {
   } else if (this._hasWon()) {
     return GameStatuses.WON;
   } else {
-    return GameStatuses.INCOMPLETE;
+    return GameStatuses.ACTIVE;
   }
 };
 
