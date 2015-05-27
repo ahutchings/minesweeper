@@ -13,6 +13,7 @@
   "author": "Andrew Hutchings <andrew.hutchings@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "flatten": "0.0.1",
     "flux": "^2.0.3",
     "global": "^4.3.0",
     "inherits": "^2.0.1",

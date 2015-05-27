@@ -11,6 +11,14 @@ var baseStyle = {
   width: 16
 };
 
+var adjacentCountColor = {
+  0 : 'transparent',
+  1 : 'blue',
+  2 : 'green',
+  3 : 'red',
+  4 : 'navy'
+};
+
 var statusStyles = {};
 
 statusStyles[CellStatuses.REVEALED] = {
@@ -31,30 +39,38 @@ statusStyles[CellStatuses.NORMAL] = {
   borderWidth: 2
 };
 
-statusStyles[CellStatuses.FLAGGED] = statusStyles[CellStatuses.NORMAL];
+statusStyles[CellStatuses.FLAGGED] = xtend(statusStyles[CellStatuses.NORMAL], {
+  color: 'red'
+});
 
 
 function render (state) {
+  var cell = state.cell;
+  var style = xtend(statusStyles[cell.status], baseStyle);
+
+  if (state.cell.status === CellStatuses.REVEALED && !cell.mine) {
+    style.color = adjacentCountColor[cell.adjacentMineCount];
+  }
+
   var attributes = {
-    style: xtend(statusStyles[state.cell.status], baseStyle),
+    style: style,
     oncontextmenu: function (event) {
       event.preventDefault();
-      event.stopPropagation();
 
       state.dispatcher.dispatch({
         actionType : 'flagCell',
-        cell       : state.cell
+        cell       : cell
       });
     },
     onclick: function (event) {
       state.dispatcher.dispatch({
         actionType : 'revealCell',
-        cell       : state.cell
+        cell       : cell
       });
     }
   };
 
-  return h('.cell', attributes, renderContent(state.cell));
+  return h('.cell', attributes, renderContent(cell));
 }
 
 function renderContent (cell) {
@@ -64,6 +80,6 @@ function renderContent (cell) {
     case CellStatuses.FLAGGED:
       return '!';
     case CellStatuses.REVEALED:
-      return cell.bomb ? '*' : '';
+      return cell.mine ? '*' : cell.adjacentMineCount + '';
   }
 }

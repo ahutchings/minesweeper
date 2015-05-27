@@ -9,7 +9,7 @@ function render (state) {
       return row({
         dispatcher : state.dispatcher,
         row        : item
-      })
+      });
     })
   );
 }

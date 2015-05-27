@@ -14,13 +14,13 @@ Minesweeper.prototype.getRows = function () {
 };
 
 Minesweeper.prototype.flagCell = function (x, y) {
-  this.board[y - 1][x - 1].status = CellStatuses.FLAGGED;
+  this.board[y][x].status = CellStatuses.FLAGGED;
   this.emit('change');
   return this;
 };
 
 Minesweeper.prototype.revealCell = function (x, y) {
-  this.board[y - 1][x - 1].status = CellStatuses.REVEALED;
+  this.board[y][x].status = CellStatuses.REVEALED;
   this.emit('change');
   return this;
 };
