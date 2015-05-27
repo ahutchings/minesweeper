@@ -25,8 +25,9 @@ dispatcher.register(function (payload) {
 
 function getState () {
   return {
-    dispatcher : dispatcher,
-    rows       : game.getRows()
+    dispatcher     : dispatcher,
+    rows           : game.getRows(),
+    remainingFlags : game.getRemainingFlagCount()
   };
 }
 
