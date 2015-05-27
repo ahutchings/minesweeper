@@ -7,7 +7,7 @@ var contentByGameStatus = {};
 
 contentByGameStatus[GameStatuses.WON] = 'B-)';
 contentByGameStatus[GameStatuses.LOST] = ':(';
-contentByGameStatus[GameStatuses.INCOMPLETE] = ':)';
+contentByGameStatus[GameStatuses.ACTIVE] = ':)';
 
 function render (state) {
   var attributes = {
