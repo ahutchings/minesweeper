@@ -6,8 +6,11 @@ var GameStatuses = require('./GameStatuses');
 module.exports = Minesweeper;
 inherits(Minesweeper, EventEmitter);
 
+var ELAPSED_TIME_INTERVAL = 1000;
+
 function Minesweeper (board) {
   this.board = board;
+  this.elapsedTime = 0;
 }
 
 Minesweeper.prototype.getRows = function () {
@@ -52,8 +55,11 @@ Minesweeper.prototype.unflagCell = function (x, y) {
   return this;
 };
 
-
 Minesweeper.prototype.revealCell = function (x, y) {
+  if (!this.timer) {
+    this.timer = setInterval(this._updateElapsedTime.bind(this), ELAPSED_TIME_INTERVAL);
+  }
+
   var cell = this.board.at(x, y);
 
   if (cell.mine) {
@@ -68,8 +74,21 @@ Minesweeper.prototype.revealCell = function (x, y) {
     }
   }
 
+  if (this.getStatus() !== GameStatuses.ACTIVE) {
+    clearInterval(this.timer);
+  }
+
   this.emit('change');
   return this;
+};
+
+Minesweeper.prototype.getElapsedTime = function () {
+  return this.elapsedTime;
+};
+
+Minesweeper.prototype._updateElapsedTime = function () {
+  this.elapsedTime += ELAPSED_TIME_INTERVAL;
+  this.emit('change');
 };
 
 Minesweeper.prototype._revealMines = function () {

@@ -33,6 +33,7 @@ dispatcher.register(function (payload) {
 function getState () {
   return {
     dispatcher     : dispatcher,
+    elapsedTime    : game.getElapsedTime(),
     gameStatus     : game.getStatus(),
     rows           : game.getRows(),
     remainingFlags : game.getRemainingFlagCount()
