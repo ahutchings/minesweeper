@@ -1,6 +1,7 @@
 var inherits = require('inherits');
 var EventEmitter = require('events').EventEmitter;
 var CellStatuses = require('./CellStatuses');
+var GameStatuses = require('./GameStatuses');
 
 module.exports = Minesweeper;
 inherits(Minesweeper, EventEmitter);
@@ -15,6 +16,28 @@ Minesweeper.prototype.getRows = function () {
 
 Minesweeper.prototype.getRemainingFlagCount = function () {
   return this.board.getRemainingFlagCount();
+};
+
+Minesweeper.prototype.getStatus = function () {
+  if (this._hasLost()) {
+    return GameStatuses.LOST;
+  } else if (this._hasWon()) {
+    return GameStatuses.WON;
+  } else {
+    return GameStatuses.INCOMPLETE;
+  }
+};
+
+Minesweeper.prototype._hasLost = function () {
+  return this.board.getCells().some(function (cell) {
+    return cell.status === CellStatuses.EXPLODED;
+  });
+};
+
+Minesweeper.prototype._hasWon = function () {
+  return this.board.getCells().every(function (cell) {
+    return cell.status !== CellStatuses.NORMAL;
+  });
 };
 
 Minesweeper.prototype.flagCell = function (x, y) {

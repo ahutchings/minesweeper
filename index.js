@@ -6,10 +6,8 @@ var BoardGenerator = require('./src/BoardGenerator');
 var Minesweeper = require('./src/Minesweeper');
 var render = require('./src/components/board');
 
-var config = new BeginnerConfig();
-var board = new BoardGenerator(config).generate();
-var game = new Minesweeper(board);
 var dispatcher = new Dispatcher();
+var game;
 
 dispatcher.register(function (payload) {
   switch (payload.actionType) {
@@ -24,25 +22,43 @@ dispatcher.register(function (payload) {
     case 'unflagCell':
       game.unflagCell(payload.cell.x, payload.cell.y);
       break;
+
+    case 'resetGame':
+      generateGame();
+      update();
+      break;
   }
 });
 
 function getState () {
   return {
     dispatcher     : dispatcher,
+    gameStatus     : game.getStatus(),
     rows           : game.getRows(),
     remainingFlags : game.getRemainingFlagCount()
   };
 }
 
+function generateGame () {
+  if (game) game.removeAllListeners();
+
+  var config = new BeginnerConfig();
+  var board = new BoardGenerator(config).generate();
+
+  game = new Minesweeper(board);
+  game.on('change', update);
+}
+
+function update () {
+  loop.update(getState());
+}
+
+generateGame();
+
 var loop = mainLoop(getState(), render, {
   create : require('virtual-dom/create-element'),
   diff   : require('virtual-dom/diff'),
   patch  : require('virtual-dom/patch')
-});
-
-game.on('change', function () {
-  loop.update(getState());
 });
 
 document.getElementById('container').appendChild(loop.target);
