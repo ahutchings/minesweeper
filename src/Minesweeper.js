@@ -25,15 +25,31 @@ Minesweeper.prototype.flagCell = function (x, y) {
 
 Minesweeper.prototype.revealCell = function (x, y) {
   var cell = this.board.at(x, y);
-  cell.status = CellStatuses.REVEALED;
 
-  if (!cell.bomb && cell.adjacentMineCount === 0) {
-    this._revealAdjacentEmptyCells(cell);
-    this._revealCellsAdjacentToEmptyRevealedCells(cell);
+  if (cell.mine) {
+    cell.status = CellStatuses.EXPLODED;
+    this._revealMines();
+  } else {
+    cell.status = CellStatuses.REVEALED;
+
+    if (cell.adjacentMineCount === 0) {
+      this._revealAdjacentEmptyCells(cell);
+      this._revealCellsAdjacentToEmptyRevealedCells(cell);
+    }
   }
 
   this.emit('change');
   return this;
+};
+
+Minesweeper.prototype._revealMines = function () {
+  this.board.getCells()
+    .filter(function (cell) {
+      return cell.status === CellStatuses.NORMAL && cell.mine;
+    })
+    .forEach(function (cell) {
+      cell.status = CellStatuses.REVEALED;
+    });
 };
 
 Minesweeper.prototype._revealAdjacentEmptyCells = function (cell) {

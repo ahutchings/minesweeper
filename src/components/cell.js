@@ -21,6 +21,10 @@ var adjacentCountColor = {
 
 var statusStyles = {};
 
+statusStyles[CellStatuses.EXPLODED] = {
+  color: 'red'
+};
+
 statusStyles[CellStatuses.REVEALED] = {
   backgroundColor: 'silver',
   borderColor: 'grey',
@@ -79,6 +83,7 @@ function renderContent (cell) {
       return '';
     case CellStatuses.FLAGGED:
       return '!';
+    case CellStatuses.EXPLODED:
     case CellStatuses.REVEALED:
       return cell.mine ? '*' : cell.adjacentMineCount + '';
   }
