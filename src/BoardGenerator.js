@@ -1,4 +1,4 @@
-var flatten = require('flatten');
+var Board = require('./Board');
 var CellStatuses = require('./CellStatuses');
 
 module.exports = BoardGenerator;
@@ -8,7 +8,13 @@ function BoardGenerator (config) {
 }
 
 BoardGenerator.prototype.generate = function () {
-  return this._setAdjacentMineCounts(this._placeMines(this._generateRows()));
+  var rows = this._generateRows();
+  var board = new Board(rows);
+
+  this._placeMines(board);
+  this._setAdjacentMineCounts(board);
+
+  return board;
 };
 
 BoardGenerator.prototype._generateRows = function () {
@@ -41,7 +47,7 @@ BoardGenerator.prototype._generateCell = function (x, y) {
 };
 
 BoardGenerator.prototype._placeMines = function (board) {
-  var cells = flatten(board);
+  var cells = board.getCells();
 
   for (var i = 0; i < this.config.MINES; i++) {
     var index = getRandomInt(0, cells.length - 1);
@@ -53,40 +59,14 @@ BoardGenerator.prototype._placeMines = function (board) {
 };
 
 BoardGenerator.prototype._setAdjacentMineCounts = function (board) {
-  var cells = flatten(board);
+  var cells = board.getCells();
 
   cells.forEach(function (cell) {
-    this._setAdjacentMineCount(board, cell);
+    var adjacentCells = board.getAdjacentCells(cell);
+    cell.adjacentMineCount = this._countMinesInCells(adjacentCells);
   }, this);
 
   return board;
-};
-
-BoardGenerator.prototype._setAdjacentMineCount = function (board, cell) {
-  var adjacentCells = this._getAdjacentCells(board, cell);
-  cell.adjacentMineCount = this._countMinesInCells(adjacentCells);
-  return cell;
-};
-
-BoardGenerator.prototype._getAdjacentCells = function (board, cell) {
-  var xRange = generateAdjacentRange(cell.x, this.config.COLS);
-  var yRange = generateAdjacentRange(cell.y, this.config.ROWS);
-
-  var adjacentCells = [];
-
-  xRange.forEach(function (x) {
-    yRange.forEach(function (y) {
-      if (!(cell.x === x && cell.y === y)) {
-        adjacentCells.push(board[y][x]);
-      }
-    });
-  });
-
-  if (adjacentCells.some(function (cell) { return !cell; })) {
-    debugger;
-  }
-
-  return adjacentCells;
 };
 
 BoardGenerator.prototype._countMinesInCells = function (cells) {
@@ -94,22 +74,6 @@ BoardGenerator.prototype._countMinesInCells = function (cells) {
     return cell.mine;
   }).length;
 };
-
-function generateAdjacentRange (num, upperBound) {
-  var range = [];
-
-  if (num > 0) {
-    range.push(num - 1);
-  }
-
-  range.push(num);
-
-  if (num < upperBound - 1) {
-    range.push(num + 1);
-  }
-
-  return range;
-}
 
 function getRandomInt (min, max) {
   return Math.floor(Math.random() * (max - min)) + min;

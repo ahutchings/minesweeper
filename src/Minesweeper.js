@@ -1,6 +1,5 @@
 var inherits = require('inherits');
 var EventEmitter = require('events').EventEmitter;
-var flatten = require('flatten');
 var CellStatuses = require('./CellStatuses');
 
 module.exports = Minesweeper;
@@ -11,35 +10,56 @@ function Minesweeper (board) {
 }
 
 Minesweeper.prototype.getRows = function () {
-  return this.board;
+  return this.board.getRows();
 };
 
 Minesweeper.prototype.getRemainingFlagCount = function () {
-  return this._getMineCount() - this._getFlaggedCount();
-};
-
-Minesweeper.prototype._getFlaggedCount = function () {
-  return flatten(this.board).filter(function (cell) {
-    return cell.status === CellStatuses.FLAGGED;
-  }).length;
-};
-
-Minesweeper.prototype._getMineCount = function () {
-  return flatten(this.board).filter(function (cell) {
-    return cell.mine;
-  }).length;
+  return this.board.getRemainingFlagCount();
 };
 
 Minesweeper.prototype.flagCell = function (x, y) {
-  this.board[y][x].status = CellStatuses.FLAGGED;
+  this.board.at(x, y).status = CellStatuses.FLAGGED;
   this.emit('change');
   return this;
 };
 
 Minesweeper.prototype.revealCell = function (x, y) {
-  this.board[y][x].status = CellStatuses.REVEALED;
+  var cell = this.board.at(x, y);
+  cell.status = CellStatuses.REVEALED;
+
+  if (!cell.bomb && cell.adjacentMineCount === 0) {
+    this._revealAdjacentEmptyCells(cell);
+    this._revealCellsAdjacentToEmptyRevealedCells(cell);
+  }
+
   this.emit('change');
   return this;
+};
+
+Minesweeper.prototype._revealAdjacentEmptyCells = function (cell) {
+  this._getAdjacentNormalEmptyCells(cell).forEach(function (cell) {
+    cell.status = CellStatuses.REVEALED;
+    this._revealAdjacentEmptyCells(cell);
+  }, this);
+};
+
+Minesweeper.prototype._getAdjacentNormalEmptyCells = function (cell) {
+  return this.board.getAdjacentCells(cell).filter(function (cell) {
+    return cell.status === CellStatuses.NORMAL && cell.adjacentMineCount === 0;
+  });
+};
+
+Minesweeper.prototype._revealCellsAdjacentToEmptyRevealedCells = function () {
+  var self = this;
+
+  this.board.getCells()
+    .filter(function (cell) {
+      return cell.status === CellStatuses.REVEALED && cell.adjacentMineCount === 0;
+    }).forEach(function (cell) {
+      self.board.getAdjacentCells(cell).forEach(function (cell) {
+        cell.status = CellStatuses.REVEALED;
+      });
+    });
 };
 
 Minesweeper.prototype.serialize = function () {
