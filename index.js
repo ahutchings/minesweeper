@@ -11,6 +11,18 @@ var board = new BoardGenerator(config).generate();
 var game = new Minesweeper(board);
 var dispatcher = new Dispatcher();
 
+dispatcher.register(function (payload) {
+  switch (payload.actionType) {
+    case 'flagCell':
+      game.flagCell(payload.cell.x, payload.cell.y);
+      break;
+
+    case 'revealCell':
+      game.revealCell(payload.cell.x, payload.cell.y);
+      break;
+  }
+});
+
 function getState () {
   return {
     dispatcher : dispatcher,

@@ -1,8 +1,9 @@
 var http = require('http');
 var ecstatic = require('ecstatic');
+var port = process.env.PORT || 3000;
 
 http.createServer(
   ecstatic({ root: __dirname })
-).listen(3000);
+).listen(port);
 
-console.log('Listening on :3000');
+console.log('Listening on :' + port);

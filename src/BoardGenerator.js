@@ -1,4 +1,4 @@
-var CellStates = require('./CellStates');
+var CellStatuses = require('./CellStatuses');
 
 module.exports = BoardGenerator;
 
@@ -13,26 +13,28 @@ BoardGenerator.prototype.generate = function () {
 BoardGenerator.prototype._generateRows = function () {
   var rows = [];
 
-  for (var i = 0; i < this.config.ROWS; i++) {
-    rows.push(this._generateRow());
+  for (var y = 1; y <= this.config.ROWS; y++) {
+    rows.push(this._generateRow(y));
   }
 
   return rows;
 };
 
-BoardGenerator.prototype._generateRow = function () {
+BoardGenerator.prototype._generateRow = function (y) {
   var row = [];
 
-  for (var i = 0; i < this.config.COLS; i++) {
-    row.push(this._generateCell());
+  for (var x = 1; x <= this.config.COLS; x++) {
+    row.push(this._generateCell(x, y));
   }
 
   return row;
 };
 
-BoardGenerator.prototype._generateCell = function () {
+BoardGenerator.prototype._generateCell = function (x, y) {
   return {
-    bomb  : false,
-    state : CellStates.NORMAL
+    bomb   : false,
+    status : CellStatuses.NORMAL,
+    x      : x,
+    y      : y
   };
 };
