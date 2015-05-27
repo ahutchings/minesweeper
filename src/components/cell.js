@@ -4,7 +4,7 @@ var CellStatuses = require('../CellStatuses');
 
 module.exports = render;
 
-var baseStyle = {
+var layout = {
   boxSizing: 'border-box',
   display: 'inline-block',
   height: 16,
@@ -19,22 +19,7 @@ var adjacentCountColor = {
   4 : 'navy'
 };
 
-var statusStyles = {};
-
-statusStyles[CellStatuses.EXPLODED] = {
-  color: 'red'
-};
-
-statusStyles[CellStatuses.REVEALED] = {
-  backgroundColor: 'silver',
-  borderColor: 'grey',
-  borderStyle: 'solid',
-  borderBottomWidth: 1,
-  borderRightWidth: 1,
-  borderWidth: 0
-};
-
-statusStyles[CellStatuses.NORMAL] = {
+var normalStyle = {
   backgroundColor: 'rgb(189, 189, 189)',
   borderColor: 'rgb(123, 123, 123)',
   borderTopColor: '#fff',
@@ -43,48 +28,78 @@ statusStyles[CellStatuses.NORMAL] = {
   borderWidth: 2
 };
 
-statusStyles[CellStatuses.FLAGGED] = xtend(statusStyles[CellStatuses.NORMAL], {
-  color: 'red'
-});
-
-
 function render (state) {
   var cell = state.cell;
-  var style = xtend(statusStyles[cell.status], baseStyle);
+  var attributes = {};
+  var style;
+  var content = '';
 
-  if (state.cell.status === CellStatuses.REVEALED && !cell.mine) {
-    style.color = adjacentCountColor[cell.adjacentMineCount];
-  }
-
-  var attributes = {
-    style: style,
-    oncontextmenu: function (event) {
-      event.preventDefault();
-
-      state.dispatcher.dispatch({
-        actionType : 'flagCell',
-        cell       : cell
-      });
-    },
-    onclick: function (event) {
-      state.dispatcher.dispatch({
-        actionType : 'revealCell',
-        cell       : cell
-      });
-    }
-  };
-
-  return h('.cell', attributes, renderContent(cell));
-}
-
-function renderContent (cell) {
   switch (cell.status) {
-    case CellStatuses.NORMAL:
-      return '';
-    case CellStatuses.FLAGGED:
-      return '!';
     case CellStatuses.EXPLODED:
+      style = {
+        backgroundColor: 'red'
+      };
+
+      content = '*';
+      break;
+
+    case CellStatuses.FLAGGED:
+      style = xtend(normalStyle, {
+        color: 'red'
+      });
+
+      attributes.oncontextmenu = function (event) {
+        event.preventDefault();
+
+        state.dispatcher.dispatch({
+          actionType : 'unflagCell',
+          cell       : cell
+        });
+      };
+
+      content = '!';
+      break;
+
+    case CellStatuses.NORMAL:
+      style = normalStyle;
+
+      attributes.oncontextmenu = function (event) {
+        event.preventDefault();
+
+        state.dispatcher.dispatch({
+          actionType : 'flagCell',
+          cell       : cell
+        });
+      };
+
+      attributes.onclick = function (event) {
+        state.dispatcher.dispatch({
+          actionType : 'revealCell',
+          cell       : cell
+        });
+      };
+
+      break;
+
     case CellStatuses.REVEALED:
-      return cell.mine ? '*' : cell.adjacentMineCount + '';
+      style = {
+        backgroundColor: 'silver',
+        borderColor: 'grey',
+        borderStyle: 'solid',
+        borderBottomWidth: 1,
+        borderRightWidth: 1,
+        borderWidth: 0
+      };
+
+      if (cell.mine) {
+        content = '*';
+      } else {
+        style.color = adjacentCountColor[cell.adjacentMineCount];
+        content = cell.adjacentMineCount + '';
+      }
   }
+
+  attributes.style = xtend(layout, style);
+
+  return h('.cell', attributes, content);
 }

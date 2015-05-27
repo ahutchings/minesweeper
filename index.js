@@ -20,6 +20,10 @@ dispatcher.register(function (payload) {
     case 'revealCell':
       game.revealCell(payload.cell.x, payload.cell.y);
       break;
+
+    case 'unflagCell':
+      game.unflagCell(payload.cell.x, payload.cell.y);
+      break;
   }
 });
 

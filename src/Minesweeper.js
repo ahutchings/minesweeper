@@ -23,6 +23,13 @@ Minesweeper.prototype.flagCell = function (x, y) {
   return this;
 };
 
+Minesweeper.prototype.unflagCell = function (x, y) {
+  this.board.at(x, y).status = CellStatuses.NORMAL;
+  this.emit('change');
+  return this;
+};
+
+
 Minesweeper.prototype.revealCell = function (x, y) {
   var cell = this.board.at(x, y);
 
