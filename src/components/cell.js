@@ -5,11 +5,16 @@ var GameStatuses = require('../GameStatuses');
 
 module.exports = render;
 
-var layout = {
+var CELL_SIZE = 16;
+
+var baseStyle = {
   boxSizing: 'border-box',
   display: 'inline-block',
-  height: 16,
-  width: 16
+  lineHeight: CELL_SIZE + 'px',
+  overflow: 'hidden',
+  textAlign: 'center',
+  height: CELL_SIZE,
+  width: CELL_SIZE
 };
 
 var adjacentCountColor = {
@@ -17,12 +22,16 @@ var adjacentCountColor = {
   1 : 'blue',
   2 : 'green',
   3 : 'red',
-  4 : 'navy'
+  4 : 'navy',
+  5 : '#8d0000',
+  6 : '#008380',
+  7 : 'black',
+  8 : '#808080'
 };
 
 var normalStyle = {
-  backgroundColor: 'rgb(189, 189, 189)',
-  borderColor: 'rgb(123, 123, 123)',
+  backgroundColor: '#bdbdbd',
+  borderColor: '#7b7b7b',
   borderTopColor: '#fff',
   borderLeftColor: '#fff',
   borderStyle: 'solid',
@@ -101,7 +110,7 @@ function render (state) {
       }
   }
 
-  attributes.style = xtend(layout, style);
+  attributes.style = xtend(baseStyle, style);
 
   return h('.cell', attributes, content);
 }
