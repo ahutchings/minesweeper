@@ -38,9 +38,13 @@ Minesweeper.prototype._hasLost = function () {
 };
 
 Minesweeper.prototype._hasWon = function () {
-  return this.board.getCells().every(function (cell) {
-    return cell.status !== CellStatuses.NORMAL;
-  });
+  return this.board.getCells()
+    .filter(function (cell) {
+      return !cell.mine;
+    })
+    .every(function (cell) {
+      return cell.status === CellStatuses.REVEALED;
+    });
 };
 
 Minesweeper.prototype.flagCell = function (x, y) {
